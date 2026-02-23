@@ -1,0 +1,72 @@
+{
+  "basicConstraints": 18,
+  "criticalExtensionOIDs": [
+    "nunc",
+    "risus"
+  ],
+  "extendedKeyUsage": [
+    "libero",
+    "ac"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "sodales"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Buford",
+      "type": 94
+    }
+  ],
+  "issuerDN": {
+    "commonName": "mi",
+    "name": "Analisa"
+  },
+  "issuerUniqueID": [
+    true,
+    true,
+    true
+  ],
+  "issuerX500Principal": {
+    "name": "Abbey"
+  },
+  "keyUsage": [
+    false,
+    false,
+    true
+  ],
+  "name": "Alva",
+  "nonCriticalExtensionOIDs": [
+    "vitae",
+    "molestie"
+  ],
+  "publicKey": {
+    "algorithm": "In",
+    "modulus": 37,
+    "params": 34,
+    "publicKey": "consectetur"
+  },
+  "serialNumber": 9,
+  "serialNumberObject": {
+    "serialNumber": 12
+  },
+  "sigAlgName": "nunc",
+  "sigAlgOID": "molestie",
+  "subjectAlternativeNames": [
+    {
+      "name": "Alyse",
+      "type": 99
+    }
+  ],
+  "subjectDN": {
+    "commonName": "mi",
+    "name": "Clayton"
+  },
+  "subjectX500Principal": {
+    "name": "Alisa"
+  },
+  "type": "arcu",
+  "version": 69
+}

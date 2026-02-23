@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:mcp="http://www.mulesoft.org/schema/mule/mcp"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/mcp http://www.mulesoft.org/schema/mule/mcp/current/mule-mcp.xsd">
+
+    <!-- Flow 1: Get Active Pay Plan for Account -->
+    <flow name="get-payplan-flow" doc:id="get-payplan-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="get-payplan" doc:name="get-payplan Tool">
+            <mcp:description><![CDATA[Get active pay plan for a given account id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "accountId": {"type": "string", "description": "The account ID to retrieve pay plan for"},
+    "sourceSystem": {"type": "string", "description": "Source system identifier"},
+    "targetSystem": {"type": "string", "description": "Target system identifier"},
+    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
+    "authToken": {"type": "string", "description": "Authentication token"},
+    "authorization": {"type": "string", "description": "Basic authorization header value"}
+  },
+  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/payplan" doc:name="GET Pay Plan">
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": vars.toolParams.sourceSystem,
+  "Target-System": vars.toolParams.targetSystem,
+  "X-Correlation-Id": vars.toolParams.correlationId,
+  "authToken": vars.toolParams.authToken,
+  "Authorization": vars.toolParams.authorization
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "accountId": vars.toolParams.accountId
+}]]]></http:uri-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow 2: Create Pay Plan for Account -->
+    <flow name="create-payplan-flow" doc:id="create-payplan-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="create-payplan" doc:name="create-payplan Tool">
+            <mcp:description><![CDATA[Create pay plan for a given account id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "accountId": {"type": "string", "description": "The account ID to create pay plan for"},
+    "sourceSystem": {"type": "string", "description": "Source system identifier"},
+    "targetSystem": {"type": "string", "description": "Target system identifier"},
+    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
+    "authToken": {"type": "string", "description": "Authentication token"},
+    "authorization": {"type": "string", "description": "Basic authorization header value"},
+    "payplan": {
+      "type": "object",
+      "description": "Pay plan creation details",
+      "properties": {
+        "payplandetails": {
+          "type": "object",
+          "properties": {
+            "accountid": {"type": "string", "description": "Account ID"},
+            "comments": {"type": "string", "description": "Comments"},
+            "payoraccountid": {"type": "string", "description": "Payor account ID"},
+            "paymethod": {"type": "string", "description": "Payment method (e.g., MAIL)"},
+            "payplanstatus": {"type": "string", "description": "Pay plan status code"},
+            "payplantype": {"type": "string", "description": "Pay plan type (e.g., CIA)"},
+            "startdate": {"type": "string", "description": "Start date (e.g., 2016-03-31 00:00:00)"},
+            "thirdpartypayor": {"type": "string", "description": "Third party payor"},
+            "thirdpartyguarantor": {"type": "string", "description": "Third party guarantor flag"},
+            "user": {"type": "string", "description": "User identifier"},
+            "pps": {
+              "type": "object",
+              "description": "Payment plan schedule",
+              "properties": {
+                "ppsrow": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "scheduleddate": {"type": "string", "description": "Scheduled payment date"},
+                      "scheduledamount": {"type": "string", "description": "Scheduled payment amount"}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "payplan"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <http:request method="POST" config-ref="HTTP_Request_Config" path="/account/{accountId}/payplan" doc:name="POST Create Pay Plan">
+            <http:body><![CDATA[#[output application/json --- {payplan: vars.toolParams.payplan}]]]></http:body>
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": vars.toolParams.sourceSystem,
+  "Target-System": vars.toolParams.targetSystem,
+  "X-Correlation-Id": vars.toolParams.correlationId,
+  "authToken": vars.toolParams.authToken,
+  "Authorization": vars.toolParams.authorization,
+  "Content-Type": "application/json"
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "accountId": vars.toolParams.accountId
+}]]]></http:uri-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow 3: Get Agency Pay Plan for Account -->
+    <flow name="get-agency-payplan-flow" doc:id="get-agency-payplan-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="get-agency-payplan" doc:name="get-agency-payplan Tool">
+            <mcp:description><![CDATA[Get agency pay plan for a given account id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "accountId": {"type": "string", "description": "The account ID to retrieve agency pay plan for"},
+    "sourceSystem": {"type": "string", "description": "Source system identifier"},
+    "targetSystem": {"type": "string", "description": "Target system identifier"},
+    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
+    "authToken": {"type": "string", "description": "Authentication token"},
+    "authorization": {"type": "string", "description": "Basic authorization header value"}
+  },
+  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/agencypayplan" doc:name="GET Agency Pay Plan">
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": vars.toolParams.sourceSystem,
+  "Target-System": vars.toolParams.targetSystem,
+  "X-Correlation-Id": vars.toolParams.correlationId,
+  "authToken": vars.toolParams.authToken,
+  "Authorization": vars.toolParams.authorization
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "accountId": vars.toolParams.accountId
+}]]]></http:uri-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow 4: Get Recommend Budget for Account -->
+    <flow name="get-recommend-budget-flow" doc:id="get-recommend-budget-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="get-recommend-budget" doc:name="get-recommend-budget Tool">
+            <mcp:description><![CDATA[Get recommend budget for a given account id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "accountId": {"type": "string", "description": "The account ID to retrieve recommend budget for"},
+    "sourceSystem": {"type": "string", "description": "Source system identifier"},
+    "targetSystem": {"type": "string", "description": "Target system identifier"},
+    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
+    "newBudgetDate": {"type": "string", "description": "New budget date (e.g., 2021-03-08)"},
+    "defaultFlag": {"type": "string", "description": "Default flag (default: RCBUD)"},
+    "recommendBudgetSwitch": {"type": "boolean", "description": "Recommend budget switch (default: true)"},
+    "budgetPlan": {"type": "string", "description": "Budget plan type (default: BPP)"},
+    "authToken": {"type": "string", "description": "Authentication token"},
+    "authorization": {"type": "string", "description": "Basic authorization header value"}
+  },
+  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "newBudgetDate"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/recommendbudget" doc:name="GET Recommend Budget">
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": vars.toolParams.sourceSystem,
+  "Target-System": vars.toolParams.targetSystem,
+  "X-Correlation-Id": vars.toolParams.correlationId,
+  "authToken": vars.toolParams.authToken,
+  "Authorization": vars.toolParams.authorization
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "accountId": vars.toolParams.accountId
+}]]]></http:uri-params>
+            <http:query-params><![CDATA[#[output application/java --- {
+  "new-budget-date": vars.toolParams.newBudgetDate,
+  "default-flag": vars.toolParams.defaultFlag default "RCBUD",
+  "recommend-budget-switch": vars.toolParams.recommendBudgetSwitch default true,
+  "budget-plan": vars.toolParams.budgetPlan default "BPP"
+}]]]></http:query-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow 5: Add Budget for Account -->
+    <flow name="add-budget-flow" doc:id="add-budget-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="add-budget" doc:name="add-budget Tool">
+            <mcp:description><![CDATA[Add budget for a given account id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "accountId": {"type": "string", "description": "The account ID to add budget for"},
+    "sourceSystem": {"type": "string", "description": "Source system identifier"},
+    "targetSystem": {"type": "string", "description": "Target system identifier"},
+    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
+    "authToken": {"type": "string", "description": "Authentication token"},
+    "authorization": {"type": "string", "description": "Basic authorization header value"},
+    "addbudget": {
+      "type": "object",
+      "description": "Add budget request body",
+      "properties": {
+        "transactiontype": {"type": "string", "description": "Transaction type"},
+        "addbudgetservice": {
+          "type": "object",
+          "properties": {
+            "addbudgetdetails": {
+              "type": "object",
+              "properties": {
+                "budgetplan": {"type": "string", "description": "Budget plan code (max 8 chars)"},
+                "newbudgetdate": {"type": "string", "description": "New budget date (format: date)"},
+                "totalbudgetamount": {"type": "number", "description": "Total budget amount"},
+                "totalnewbudget": {"type": "number", "description": "Total new budget amount"},
+                "sabudget": {
+                  "type": "array",
+                  "description": "Service agreement budget entries",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "sabudgetrow": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "rowaction": {"type": "string"},
+                            "serviceagreement": {"type": "string"},
+                            "lastchangeddate": {"type": "string"},
+                            "budgetamount": {"type": "number"},
+                            "newbudget": {"type": "number"}
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "addbudget"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <http:request method="PUT" config-ref="HTTP_Request_Config" path="/account/{accountId}/addbudget" doc:name="PUT Add Budget">
+            <http:body><![CDATA[#[output application/json --- {addbudget: vars.toolParams.addbudget}]]]></http:body>
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": vars.toolParams.sourceSystem,
+  "Target-System": vars.toolParams.targetSystem,
+  "X-Correlation-Id": vars.toolParams.correlationId,
+  "authToken": vars.toolParams.authToken,
+  "Authorization": vars.toolParams.authorization,
+  "Content-Type": "application/json"
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "accountId": vars.toolParams.accountId
+}]]]></http:uri-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow 6: Cancel Budget for Account -->
+    <flow name="cancel-budget-flow" doc:id="cancel-budget-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="cancel-budget" doc:name="cancel-budget Tool">
+            <mcp:description><![CDATA[Cancel budget for a given account id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "accountId": {"type": "string", "description": "The account ID to cancel budget for"},
+    "sourceSystem": {"type": "string", "description": "Source system identifier"},
+    "targetSystem": {"type": "string", "description": "Target system identifier"},
+    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
+    "authToken": {"type": "string", "description": "Authentication token"},
+    "authorization": {"type": "string", "description": "Basic authorization header value"},
+    "cancelbudget": {
+      "type": "object",
+      "description": "Cancel budget request body",
+      "properties": {
+        "cancelbudgetservice": {
+          "type": "object",
+          "properties": {
+            "cancelbudgetdetails": {
+              "type": "object",
+              "properties": {
+                "cancel": {"type": "boolean", "description": "Cancel flag"},
+                "version": {"type": "integer", "description": "Version number"},
+                "newbudgetdate": {"type": "string", "description": "New budget date (format: date)"},
+                "totalnewbudget": {"type": "number", "description": "Total new budget amount"}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "cancelbudget"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <http:request method="PUT" config-ref="HTTP_Request_Config" path="/account/{accountId}/cancelbudget" doc:name="PUT Cancel Budget">
+            <http:body><![CDATA[#[output application/json --- {cancelbudget: vars.toolParams.cancelbudget}]]]></http:body>
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": vars.toolParams.sourceSystem,
+  "Target-System": vars.toolParams.targetSystem,
+  "X-Correlation-Id": vars.toolParams.correlationId,
+  "authToken": vars.toolParams.authToken,
+  "Authorization": vars.toolParams.authorization,
+  "Content-Type": "application/json"
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "accountId": vars.toolParams.accountId
+}]]]></http:uri-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow 7: Get Active Pay Plan for Account -->
+    <flow name="get-active-payplan-flow" doc:id="get-active-payplan-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="get-active-payplan" doc:name="get-active-payplan Tool">
+            <mcp:description><![CDATA[Get active payplan for a given account]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "accountId": {"type": "string", "description": "The account ID to retrieve active payplan for"},
+    "sourceSystem": {"type": "string", "description": "Source system identifier"},
+    "targetSystem": {"type": "string", "description": "Target system identifier"},
+    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
+    "authToken": {"type": "string", "description": "Authentication token"},
+    "authorization": {"type": "string", "description": "Basic authorization header value"}
+  },
+  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/activepayplan" doc:name="GET Active Pay Plan">
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": vars.toolParams.sourceSystem,
+  "Target-System": vars.toolParams.targetSystem,
+  "X-Correlation-Id": vars.toolParams.correlationId,
+  "authToken": vars.toolParams.authToken,
+  "Authorization": vars.toolParams.authorization
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "accountId": vars.toolParams.accountId
+}]]]></http:uri-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow 8: Update/Cancel Pay Plan -->
+    <flow name="update-payplan-flow" doc:id="update-payplan-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="update-payplan" doc:name="update-payplan Tool">
+            <mcp:description><![CDATA[Update or cancel payplan for a given payplan id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "payplanId": {"type": "string", "description": "The payplan ID to update or cancel"},
+    "sourceSystem": {"type": "string", "description": "Source system identifier"},
+    "targetSystem": {"type": "string", "description": "Target system identifier"},
+    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
+    "iscancel": {"type": "string", "description": "Whether to cancel the payplan"},
+    "payplancancelreasondescription": {"type": "string", "description": "Reason description for payplan cancellation"},
+    "authToken": {"type": "string", "description": "Authentication token"},
+    "authorization": {"type": "string", "description": "Basic authorization header value"}
+  },
+  "required": ["payplanId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "iscancel"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <http:request method="PUT" config-ref="HTTP_Request_Config" path="/payplan/{payplanId}" doc:name="PUT Update Pay Plan">
+            <http:body><![CDATA[#[output application/json --- {
+  iscancel: vars.toolParams.iscancel,
+  payplancancelreasondescription: vars.toolParams.payplancancelreasondescription
+}]]]></http:body>
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": vars.toolParams.sourceSystem,
+  "Target-System": vars.toolParams.targetSystem,
+  "X-Correlation-Id": vars.toolParams.correlationId,
+  "authToken": vars.toolParams.authToken,
+  "Authorization": vars.toolParams.authorization,
+  "Content-Type": "application/json"
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "payplanId": vars.toolParams.payplanId
+}]]]></http:uri-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow 9: Get Pay Plan Override for Account -->
+    <flow name="get-payplan-override-flow" doc:id="get-payplan-override-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="get-payplan-override" doc:name="get-payplan-override Tool">
+            <mcp:description><![CDATA[Get payplan override for a given account id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "accountId": {"type": "string", "description": "The account ID to retrieve payplan override for"},
+    "sourceSystem": {"type": "string", "description": "Source system identifier"},
+    "targetSystem": {"type": "string", "description": "Target system identifier"},
+    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
+    "authToken": {"type": "string", "description": "Authentication token"},
+    "authorization": {"type": "string", "description": "Basic authorization header value"},
+    "goodFaithPaymentDate": {"type": "string", "description": "Good faith payment date (e.g., 2016-03-31 00:00:00)"},
+    "goodFaithPaymentAmount": {"type": "string", "description": "Good faith payment amount"},
+    "numInstallments": {"type": "string", "description": "Number of installments"},
+    "overrideType": {"type": "string", "description": "Override type (e.g., NONE)"}
+  },
+  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/payplanoverride" doc:name="GET Pay Plan Override">
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": vars.toolParams.sourceSystem,
+  "Target-System": vars.toolParams.targetSystem,
+  "X-Correlation-Id": vars.toolParams.correlationId,
+  "authToken": vars.toolParams.authToken,
+  "Authorization": vars.toolParams.authorization
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "accountId": vars.toolParams.accountId
+}]]]></http:uri-params>
+            <http:query-params><![CDATA[#[output application/java --- {
+  ("goodFaithPaymentDate": vars.toolParams.goodFaithPaymentDate) if vars.toolParams.goodFaithPaymentDate?,
+  ("goodFaithPaymentAmount": vars.toolParams.goodFaithPaymentAmount) if vars.toolParams.goodFaithPaymentAmount?,
+  ("numInstallments": vars.toolParams.numInstallments) if vars.toolParams.numInstallments?,
+  ("overrideType": vars.toolParams.overrideType) if vars.toolParams.overrideType?
+}]]]></http:query-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+</mule>

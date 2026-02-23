@@ -1,0 +1,7 @@
+{
+    "name": "customer-payplan-mcp-server",
+    "minMuleVersion": "4.11.0",
+    "javaSpecificationVersions": [
+      "17"
+    ]
+}

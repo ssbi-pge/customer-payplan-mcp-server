@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:mcp="http://www.mulesoft.org/schema/mule/mcp"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/mcp http://www.mulesoft.org/schema/mule/mcp/current/mule-mcp.xsd">
+
+    <configuration-properties file="config.properties" doc:name="Configuration properties" />
+
+    <http:listener-config name="MCP_HTTP_Listener_Config" doc:name="HTTP Listener Config">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+
+    <mcp:server-config name="MCP_Server_Config" doc:name="MCP Server Config" serverName="customer-payplan-mcp-server" serverVersion="1.0.0">
+        <mcp:streamable-http-server-connection listenerConfig="MCP_HTTP_Listener_Config">
+            <mcp:session-handling />
+        </mcp:streamable-http-server-connection>
+    </mcp:server-config>
+
+    <http:request-config name="HTTP_Request_Config" doc:name="HTTP Request Config" basePath="${api.basePath}">
+        <http:request-connection host="${api.host}" port="${api.port}" protocol="HTTPS" />
+    </http:request-config>
+
+</mule>
