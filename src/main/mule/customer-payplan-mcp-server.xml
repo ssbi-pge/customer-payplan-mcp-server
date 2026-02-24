@@ -11,6 +11,13 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/mcp http://www.mulesoft.org/schema/mule/mcp/current/mule-mcp.xsd">
 
+    <!-- MCP Inspector: Serves native inspector UI at /inspector -->
+    <flow name="mcp-inspector-flow" doc:id="mcp-inspector-flow">
+        <http:listener config-ref="MCP_HTTP_Listener_Config" path="/inspector" doc:name="GET /inspector" allowedMethods="GET" />
+        <parse-template location="inspector.html" doc:name="Serve Inspector HTML" />
+        <set-payload value="#[payload]" mimeType="text/html" doc:name="Set Content-Type" />
+    </flow>
+
     <!-- Flow 1: Get Active Pay Plan for Account -->
     <flow name="get-payplan-flow" doc:id="get-payplan-flow">
         <mcp:tool-listener config-ref="MCP_Server_Config" name="get-payplan" doc:name="get-payplan Tool">
