@@ -538,4 +538,166 @@ payload]]></ee:set-payload>
         </ee:transform>
     </flow>
 
+    <!-- ==================== MCP Resources ==================== -->
+
+    <!-- Resource 1: Server Overview -->
+    <flow name="resource-server-overview-flow" doc:id="resource-server-overview-flow">
+        <mcp:resource-listener config-ref="MCP_Server_Config" name="Server Overview" uri="resource://server/overview" resourceMimeType="application/json" doc:name="Server Overview Resource">
+            <mcp:description><![CDATA[Overview of the customer-payplan-mcp-server including available tools and API information]]></mcp:description>
+            <mcp:resource-listener-content>
+                <mcp:text-resource text="#[write(payload, 'application/json')]" />
+            </mcp:resource-listener-content>
+        </mcp:resource-listener>
+        <ee:transform doc:name="Build Server Overview">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  serverName: "customer-payplan-mcp-server",
+  serverVersion: "1.0.0",
+  description: "MCP server exposing customer pay plan operations for account management",
+  apiBasePath: p('api.basePath'),
+  apiHost: p('api.host'),
+  tools: [
+    { name: "get-payplan", method: "GET", description: "Get active pay plan for a given account id" },
+    { name: "create-payplan", method: "POST", description: "Create pay plan for a given account id" },
+    { name: "get-agency-payplan", method: "GET", description: "Get agency pay plan for a given account id" },
+    { name: "get-recommend-budget", method: "GET", description: "Get recommend budget for a given account id" },
+    { name: "add-budget", method: "PUT", description: "Add budget for a given account id" },
+    { name: "cancel-budget", method: "PUT", description: "Cancel budget for a given account id" },
+    { name: "get-active-payplan", method: "GET", description: "Get active payplan for a given account" },
+    { name: "update-payplan", method: "PUT", description: "Update or cancel payplan for a given payplan id" },
+    { name: "get-payplan-override", method: "GET", description: "Get payplan override for a given account id" }
+  ],
+  resources: [
+    { uri: "resource://server/overview", description: "This resource - server overview" },
+    { uri: "resource://tools/catalog", description: "Detailed tool catalog with parameter schemas" },
+    { uri: "resource://api/endpoints", description: "Backend API endpoint documentation" }
+  ]
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Resource 2: Tool Catalog with Parameter Schemas -->
+    <flow name="resource-tool-catalog-flow" doc:id="resource-tool-catalog-flow">
+        <mcp:resource-listener config-ref="MCP_Server_Config" name="Tool Catalog" uri="resource://tools/catalog" resourceMimeType="application/json" doc:name="Tool Catalog Resource">
+            <mcp:description><![CDATA[Detailed catalog of all tools with their parameter schemas and usage examples]]></mcp:description>
+            <mcp:resource-listener-content>
+                <mcp:text-resource text="#[write(payload, 'application/json')]" />
+            </mcp:resource-listener-content>
+        </mcp:resource-listener>
+        <ee:transform doc:name="Build Tool Catalog">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  catalog: [
+    {
+      name: "get-payplan",
+      description: "Get active pay plan for a given account id",
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>" }
+    },
+    {
+      name: "create-payplan",
+      description: "Create pay plan for a given account id",
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "payplan"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", payplan: { payplandetails: { accountid: "1234567890", payplantype: "CIA", paymethod: "MAIL", startdate: "2026-01-01 00:00:00", pps: { ppsrow: [{ scheduleddate: "2026-02-01", scheduledamount: "100.00" }] } } } }
+    },
+    {
+      name: "get-agency-payplan",
+      description: "Get agency pay plan for a given account id",
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>" }
+    },
+    {
+      name: "get-recommend-budget",
+      description: "Get recommend budget for a given account id",
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "newBudgetDate"],
+      optionalParams: ["defaultFlag", "recommendBudgetSwitch", "budgetPlan"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", newBudgetDate: "2026-03-08", defaultFlag: "RCBUD", recommendBudgetSwitch: true, budgetPlan: "BPP" }
+    },
+    {
+      name: "add-budget",
+      description: "Add budget for a given account id",
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "addbudget"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", addbudget: { transactiontype: "ADD", addbudgetservice: { addbudgetdetails: { budgetplan: "BPP", newbudgetdate: "2026-03-08", totalbudgetamount: 500, totalnewbudget: 500 } } } }
+    },
+    {
+      name: "cancel-budget",
+      description: "Cancel budget for a given account id",
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "cancelbudget"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", cancelbudget: { cancelbudgetservice: { cancelbudgetdetails: { cancel: true, version: 1, newbudgetdate: "2026-03-08", totalnewbudget: 0 } } } }
+    },
+    {
+      name: "get-active-payplan",
+      description: "Get active payplan for a given account",
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>" }
+    },
+    {
+      name: "update-payplan",
+      description: "Update or cancel payplan for a given payplan id",
+      requiredParams: ["payplanId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "iscancel"],
+      optionalParams: ["payplancancelreasondescription"],
+      example: { payplanId: "PP-12345", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", iscancel: "true", payplancancelreasondescription: "Customer requested cancellation" }
+    },
+    {
+      name: "get-payplan-override",
+      description: "Get payplan override for a given account id",
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"],
+      optionalParams: ["goodFaithPaymentDate", "goodFaithPaymentAmount", "numInstallments", "overrideType"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", goodFaithPaymentDate: "2026-03-31 00:00:00", goodFaithPaymentAmount: "50.00", numInstallments: "6", overrideType: "NONE" }
+    }
+  ]
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Resource 3: Backend API Endpoints Documentation -->
+    <flow name="resource-api-endpoints-flow" doc:id="resource-api-endpoints-flow">
+        <mcp:resource-listener config-ref="MCP_Server_Config" name="API Endpoints" uri="resource://api/endpoints" resourceMimeType="application/json" doc:name="API Endpoints Resource">
+            <mcp:description><![CDATA[Documentation of the backend API endpoints used by this MCP server]]></mcp:description>
+            <mcp:resource-listener-content>
+                <mcp:text-resource text="#[write(payload, 'application/json')]" />
+            </mcp:resource-listener-content>
+        </mcp:resource-listener>
+        <ee:transform doc:name="Build API Endpoints Doc">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  apiName: "Customer PayPlan V3 PAPI",
+  basePath: p('api.basePath'),
+  host: p('api.host'),
+  port: p('api.port'),
+  protocol: "HTTPS",
+  endpoints: [
+    { method: "GET", path: "/account/{accountId}/payplan", description: "Get pay plan for account", tool: "get-payplan" },
+    { method: "POST", path: "/account/{accountId}/payplan", description: "Create pay plan for account", tool: "create-payplan" },
+    { method: "GET", path: "/account/{accountId}/agencypayplan", description: "Get agency pay plan for account", tool: "get-agency-payplan" },
+    { method: "GET", path: "/account/{accountId}/recommendbudget", description: "Get recommend budget for account", tool: "get-recommend-budget" },
+    { method: "PUT", path: "/account/{accountId}/addbudget", description: "Add budget for account", tool: "add-budget" },
+    { method: "PUT", path: "/account/{accountId}/cancelbudget", description: "Cancel budget for account", tool: "cancel-budget" },
+    { method: "GET", path: "/account/{accountId}/activepayplan", description: "Get active payplan for account", tool: "get-active-payplan" },
+    { method: "PUT", path: "/payplan/{payplanId}", description: "Update or cancel payplan", tool: "update-payplan" },
+    { method: "GET", path: "/account/{accountId}/payplanoverride", description: "Get payplan override for account", tool: "get-payplan-override" }
+  ],
+  requiredHeaders: [
+    { name: "Source-System", description: "Source system identifier" },
+    { name: "Target-System", description: "Target system identifier" },
+    { name: "X-Correlation-Id", description: "Correlation ID for request tracking" },
+    { name: "authToken", description: "Authentication token" },
+    { name: "Authorization", description: "Basic authorization header value" }
+  ]
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
 </mule>

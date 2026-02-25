@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="client">
+            <description><![CDATA[Configuration element to act as a client that connects to an MCP server]]></description>
+            <parameters>
+                <parameter name="clientName">
+                    <description><![CDATA[The name that this client will use to identify itself during the protocol initialization phase. Not to be confused with the name given to this config element (which will later be referenced through config-ref parameters). This name doesn't need to be unique]]></description>
+                </parameter>
+                <parameter name="clientVersion">
+                    <description><![CDATA[The version that this client will use to identify itself during the protocol initialization phase. This doesn't need to match the connector or mule application version.]]></description>
+                </parameter>
+                <parameter name="name">
+                    <description><![CDATA[The identifier of this element used to reference it in other components]]></description>
+                </parameter>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+            </parameters>
+        </config>
+        <config name="server">
+            <description><![CDATA[Configuration element to act as an MCP server]]></description>
+            <parameters>
+                <parameter name="serverName">
+                    <description><![CDATA[The name that this server will use to identify itself during the protocol initialization phase. Not to be confused with the name given to this config element (which will later be referenced through config-ref parameters). This name doesn't need to be unique]]></description>
+                </parameter>
+                <parameter name="serverVersion">
+                    <description><![CDATA[The version that this client will use to identify itself during the protocol initialization phase. This doesn't need to match the connector or mule application version.]]></description>
+                </parameter>
+                <parameter name="name">
+                    <description><![CDATA[The identifier of this element used to reference it in other components]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="sse-client">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="requestTimeout">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="requestTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="authentication">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="defaultRequestHeaders">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="serverUrl">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="sseEndpointPath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="reconnectionDelay">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="reconnectionDelayUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="streamable-http-client">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="requestTimeout">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="requestTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="authentication">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="defaultRequestHeaders">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="serverUrl">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="mcpEndpointPath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="sse-server">
+            <description><![CDATA[Exposes the MCP server using the SSE transport, as defined in https://spec.modelcontextprotocol.io/specification/2024-11-05/basic/transports/#http-with-sse[] IMPORTANT: This connection type only works if Mule is started with the mule.http.service.implementation=NETTY system property.]]></description>
+            <parameters>
+                <parameter name="requestTimeout">
+                    <description><![CDATA[Request timeout]]></description>
+                </parameter>
+                <parameter name="requestTimeoutUnit">
+                    <description><![CDATA[Request Timeout unit]]></description>
+                </parameter>
+                <parameter name="listenerConfig">
+                    <description><![CDATA[Reference to the http:listener-config used to expose the SSE and messaging endpoints]]></description>
+                </parameter>
+                <parameter name="sseEndpointPath">
+                    <description><![CDATA[The endpoint path clients will use to initiate the SSE connection]]></description>
+                </parameter>
+                <parameter name="messagesPath">
+                    <description><![CDATA[The path for the messaging endpoint request will be sent to]]></description>
+                </parameter>
+                <parameter name="defaultSseResponseHeaders">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="defaultMessageResponseHeaders">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="streamable-http-server">
+            <description><![CDATA[Exposes the MCP server using the Streamable Http transport, as defined in https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http[]]]></description>
+            <parameters>
+                <parameter name="requestTimeout">
+                    <description><![CDATA[Request timeout]]></description>
+                </parameter>
+                <parameter name="requestTimeoutUnit">
+                    <description><![CDATA[Request Timeout unit]]></description>
+                </parameter>
+                <parameter name="listenerConfig">
+                    <description><![CDATA[Reference to the http:listener-config used to expose the SSE and messaging endpoints]]></description>
+                </parameter>
+                <parameter name="mcpEndpointPath">
+                    <description><![CDATA[The endpoint path clients will use to initiate the SSE connection]]></description>
+                </parameter>
+                <parameter name="responseContentType">
+                    <description><![CDATA[Whether responses should be sent by initiating a SSE stream or returning a single application/json body.]]></description>
+                </parameter>
+                <parameter name="defaultResponseHeaders">
+                    <description><![CDATA[Custom headers to be included on all valid responses (not including rejected invalid requests)]]></description>
+                </parameter>
+                <parameter name="sessionIdleTimeout">
+                    <description><![CDATA[Timeout for idle sessions]]></description>
+                </parameter>
+                <parameter name="sessionIdleTimeoutUnit">
+                    <description><![CDATA[Time unit qualifying the #sessionIdleTimeout]]></description>
+                </parameter>
+                <parameter name="sessionsObjectStore">
+                    <description><![CDATA[An ObjectStore used to store session information. When deploying to multiple replicas, it is recommended to define a specific object store that will be distributed across all of them, either through Hazelcast or OSv2. If not specified, a default transient instance will be created.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="MCP">
+        <description><![CDATA[Allows Mule applications to act as both MCP servers and clients This BETA version includes support for tools and resources. More protocol features will be added shortly!]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="callTool">
+            <description><![CDATA[Invokes a tool in a remote MCP server]]></description>
+            <parameters>
+                <parameter name="toolName">
+                    <description><![CDATA[the name of the tool to be invoked]]></description>
+                </parameter>
+                <parameter name="arguments">
+                    <description><![CDATA[the tool's input arguments]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="additionalProperties">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="listResources">
+            <description><![CDATA[Lists all the available resources in the remote MCP Server]]></description>
+            <parameters>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="listTools">
+            <description><![CDATA[Lists all the available tools in the remote MCP server]]></description>
+            <parameters>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="ping">
+            <description><![CDATA[Pings the remote server]]></description>
+            <parameters>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="readResource">
+            <description><![CDATA[Reads a resource referenced by its URI]]></description>
+            <parameters>
+                <parameter name="uri">
+                    <description><![CDATA[A valid URI]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="additionalProperties">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="errorMappings">
+                    <description><![CDATA[Set of error mappings]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources>
+        <source name="OnNewSessionListener">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+                <parameter name="rejectWithStatusCode">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="rejectWithMessage">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="rejectWithHeaders">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </source>
+        <source name="ResourceListener">
+            <description><![CDATA[Exposes a resource which content is generated by the execution of the owning flow. The flow will be executed for every received resources/read request. The user can choose to implement the flow so that the resource content is static or to make it dynamic. For instance, a dynamic resource could be a expenses.csv file, that is actually the result of executing a live DB query. Or a static resource could be a file obtained through Amazon S3 and locally cached using the &lt;ee:cache&gt; component.]]></description>
+            <parameters>
+                <parameter name="name">
+                    <description><![CDATA[The resource name]]></description>
+                </parameter>
+                <parameter name="description">
+                    <description><![CDATA[A detailed enough description for an LLM to determine when this resource should be read]]></description>
+                </parameter>
+                <parameter name="uri">
+                    <description><![CDATA[The resource URI]]></description>
+                </parameter>
+                <parameter name="resourceMimeType">
+                    <description><![CDATA[The resource mime type]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+                <parameter name="resourceListenerContent">
+                    <description><![CDATA[Defines the resource content and type. These parameters will be evaluated when the flow finishes successfully (payload and variables available)]]></description>
+                </parameter>
+            </parameters>
+        </source>
+        <source name="ToolListener">
+            <description><![CDATA[Exposes a tool which result is generated by the execution of the owning flow. The flow will be executed for every received tools/call request. When triggered, the flow will be executed with a message which payload is a Java map holding the input arguments. The tool response is generated when the flow finishes either successfully or with error. In both cases, the response can include several content items of different types. If no error response is defined, then a text content item holding the error's description will be generated automatically]]></description>
+            <parameters>
+                <parameter name="name">
+                    <description><![CDATA[The tool's name]]></description>
+                </parameter>
+                <parameter name="description">
+                    <description><![CDATA[A detailed enough description for an LLM to determine when this tool should be called]]></description>
+                </parameter>
+                <parameter name="parametersSchema">
+                    <description><![CDATA[A JSON schema defining an object which fields will act as the tool's input arguments]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+                <parameter name="responses">
+                    <description><![CDATA[The response items when the flow finishes successfully]]></description>
+                </parameter>
+                <parameter name="onErrorResponses">
+                    <description><![CDATA[the content items when the flow finishes in error]]></description>
+                </parameter>
+            </parameters>
+        </source>
+    </sources>
+    <types>
+        <type name="com.mulesoft.connectors.mcp.api.client.resource.ResourceMetadata">
+            <description><![CDATA[Describes a resource properties, without specifying its content.
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="uri">
+                    <description><![CDATA[The resource URI]]></description>
+                </parameter>
+                <parameter name="name">
+                    <description><![CDATA[The resource name]]></description>
+                </parameter>
+                <parameter name="description">
+                    <description><![CDATA[The resource description]]></description>
+                </parameter>
+                <parameter name="mimeType">
+                    <description><![CDATA[The resource mimeType]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.client.tool.CallToolResponse">
+            <description><![CDATA[The response obtained from calling a tool as a client
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="contents">
+                    <description><![CDATA[The contents generated by the tool]]></description>
+                </parameter>
+                <parameter name="error">
+                    <description><![CDATA[Whether the tool execution was successful or errored out. Notice that even in case of error, contents could have been
+ generated]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.client.tool.ResourceContent">
+            <description><![CDATA[A flattened representation of a resource content. The resource can be of either text or blob types. The text property will be
+ set for text resources, while the blob one will be used for the latter
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="uri">
+                    <description><![CDATA[The resource URI]]></description>
+                </parameter>
+                <parameter name="mimeType">
+                    <description><![CDATA[The resource mimeType]]></description>
+                </parameter>
+                <parameter name="text">
+                    <description><![CDATA[The content of a text resource. Null for blob ones]]></description>
+                </parameter>
+                <parameter name="blob">
+                    <description><![CDATA[The content of a blob resource. Null for text ones.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.client.tool.ToolMetadata">
+            <description><![CDATA[Describes a tool through its properties
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="name">
+                    <description><![CDATA[The tool name]]></description>
+                </parameter>
+                <parameter name="description">
+                    <description><![CDATA[A detailed enough description for an LLM to determine when this tool should be called]]></description>
+                </parameter>
+                <parameter name="inputSchema">
+                    <description><![CDATA[A JSON Schema describing the tool's input parameters.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.connection.NewSessionRequest">
+            <description><![CDATA[Contains the data associated to a client requiring the creation of a new server session
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="clientCertificate">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="sessionId">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="additionalProperties">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.RequestAttributes">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="clientCertificate">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="sessionId">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="requestId">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="additionalProperties">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.resource.BlobResource">
+            <description><![CDATA[Defines the contents of a Blob Resource
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="blob">
+                    <description><![CDATA[The raw blob content, without base64 encoding.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.resource.Resource">
+            <description><![CDATA[Base contract for defining the contents of an MCP Resource
+
+ @since 0.1.0]]></description>
+            <parameters/>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.resource.ResourceRequest">
+            <description><![CDATA[An inbound request for a resource, used when the connector is acting as an MCP server
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="requestedUri">
+                    <description><![CDATA[The URI for the requested resource]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.resource.TextResource">
+            <description><![CDATA[Defines a text resource]]></description>
+            <parameters>
+                <parameter name="text">
+                    <description><![CDATA[The text content]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.tool.BlobResourceToolResponseContent">
+            <description><![CDATA[Defines an embedded blob resource that's part of the response of a Tool implemented through this connector
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="audience">
+                    <description><![CDATA[Describes who the intended customer of this data is. It can include multiple entries to indicate content useful for multiple
+ audiences.]]></description>
+                </parameter>
+                <parameter name="priority">
+                    <description><![CDATA[Describes how important this data is for operating the server. A value of 1 means "most important" and indicates that the
+ data is effectively required, while 0 means "least important" and indicates that the data is entirely optional]]></description>
+                </parameter>
+                <parameter name="blob">
+                    <description><![CDATA[The raw resource content, without base64 encoding]]></description>
+                </parameter>
+                <parameter name="uri">
+                    <description><![CDATA[The resource URI]]></description>
+                </parameter>
+                <parameter name="mimeType">
+                    <description><![CDATA[The resource mimeType]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.tool.ImageToolResponseContent">
+            <description><![CDATA[Defines an image content that's part of the response of a tool implemented through this connector]]></description>
+            <parameters>
+                <parameter name="audience">
+                    <description><![CDATA[Describes who the intended customer of this data is. It can include multiple entries to indicate content useful for multiple
+ audiences.]]></description>
+                </parameter>
+                <parameter name="priority">
+                    <description><![CDATA[Describes how important this data is for operating the server. A value of 1 means "most important" and indicates that the
+ data is effectively required, while 0 means "least important" and indicates that the data is entirely optional]]></description>
+                </parameter>
+                <parameter name="data">
+                    <description><![CDATA[The raw image content, without base64 encoding]]></description>
+                </parameter>
+                <parameter name="mimeType">
+                    <description><![CDATA[The image mimeType]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.tool.TextResourceToolResponseContent">
+            <description><![CDATA[Defines an embedded text resource that's part of the response of a Tool implemented through this connector
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="audience">
+                    <description><![CDATA[Describes who the intended customer of this data is. It can include multiple entries to indicate content useful for multiple
+ audiences.]]></description>
+                </parameter>
+                <parameter name="priority">
+                    <description><![CDATA[Describes how important this data is for operating the server. A value of 1 means "most important" and indicates that the
+ data is effectively required, while 0 means "least important" and indicates that the data is entirely optional]]></description>
+                </parameter>
+                <parameter name="uri">
+                    <description><![CDATA[The resource URI]]></description>
+                </parameter>
+                <parameter name="mimeType">
+                    <description><![CDATA[The resource mimeType]]></description>
+                </parameter>
+                <parameter name="text">
+                    <description><![CDATA[The resource text]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.tool.TextToolResponseContent">
+            <description><![CDATA[Defines a text content that's part of the response of a tool implemented through this connector
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="audience">
+                    <description><![CDATA[Describes who the intended customer of this data is. It can include multiple entries to indicate content useful for multiple
+ audiences.]]></description>
+                </parameter>
+                <parameter name="priority">
+                    <description><![CDATA[Describes how important this data is for operating the server. A value of 1 means "most important" and indicates that the
+ data is effectively required, while 0 means "least important" and indicates that the data is entirely optional]]></description>
+                </parameter>
+                <parameter name="text">
+                    <description><![CDATA[The content text]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connectors.mcp.api.server.tool.ToolResponseContent">
+            <description><![CDATA[Base class for a Tool response content implemented through this connector
+
+ @since 0.1.0]]></description>
+            <parameters>
+                <parameter name="audience">
+                    <description><![CDATA[Describes who the intended customer of this data is. It can include multiple entries to indicate content useful for multiple
+ audiences.]]></description>
+                </parameter>
+                <parameter name="priority">
+                    <description><![CDATA[Describes how important this data is for operating the server. A value of 1 means "most important" and indicates that the
+ data is effectively required, while 0 means "least important" and indicates that the data is entirely optional]]></description>
+                </parameter>
+            </parameters>
+        </type>
+    </types>
+</extension-documentation>
