@@ -25,27 +25,23 @@
             <mcp:parameters-schema><![CDATA[{
   "type": "object",
   "properties": {
-    "accountId": {"type": "string", "description": "The account ID to retrieve pay plan for"},
-    "sourceSystem": {"type": "string", "description": "Source system identifier"},
-    "targetSystem": {"type": "string", "description": "Target system identifier"},
-    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
-    "authToken": {"type": "string", "description": "Authentication token"},
-    "authorization": {"type": "string", "description": "Basic authorization header value"}
+    "accountId": {"type": "string", "description": "The account ID to retrieve pay plan for"}
   },
-  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"]
+  "required": ["accountId"]
 }]]></mcp:parameters-schema>
             <mcp:responses>
                 <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
             </mcp:responses>
         </mcp:tool-listener>
         <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
         <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/payplan" doc:name="GET Pay Plan">
             <http:headers><![CDATA[#[output application/java --- {
-  "Source-System": vars.toolParams.sourceSystem,
-  "Target-System": vars.toolParams.targetSystem,
-  "X-Correlation-Id": vars.toolParams.correlationId,
-  "authToken": vars.toolParams.authToken,
-  "Authorization": vars.toolParams.authorization
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization')
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -69,11 +65,6 @@ payload]]></ee:set-payload>
   "type": "object",
   "properties": {
     "accountId": {"type": "string", "description": "The account ID to create pay plan for"},
-    "sourceSystem": {"type": "string", "description": "Source system identifier"},
-    "targetSystem": {"type": "string", "description": "Target system identifier"},
-    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
-    "authToken": {"type": "string", "description": "Authentication token"},
-    "authorization": {"type": "string", "description": "Basic authorization header value"},
     "payplan": {
       "type": "object",
       "description": "Pay plan creation details",
@@ -112,21 +103,22 @@ payload]]></ee:set-payload>
       }
     }
   },
-  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "payplan"]
+  "required": ["accountId", "payplan"]
 }]]></mcp:parameters-schema>
             <mcp:responses>
                 <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
             </mcp:responses>
         </mcp:tool-listener>
         <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
         <http:request method="POST" config-ref="HTTP_Request_Config" path="/account/{accountId}/payplan" doc:name="POST Create Pay Plan">
             <http:body><![CDATA[#[output application/json --- {payplan: vars.toolParams.payplan}]]]></http:body>
             <http:headers><![CDATA[#[output application/java --- {
-  "Source-System": vars.toolParams.sourceSystem,
-  "Target-System": vars.toolParams.targetSystem,
-  "X-Correlation-Id": vars.toolParams.correlationId,
-  "authToken": vars.toolParams.authToken,
-  "Authorization": vars.toolParams.authorization,
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization'),
   "Content-Type": "application/json"
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
@@ -150,27 +142,23 @@ payload]]></ee:set-payload>
             <mcp:parameters-schema><![CDATA[{
   "type": "object",
   "properties": {
-    "accountId": {"type": "string", "description": "The account ID to retrieve agency pay plan for"},
-    "sourceSystem": {"type": "string", "description": "Source system identifier"},
-    "targetSystem": {"type": "string", "description": "Target system identifier"},
-    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
-    "authToken": {"type": "string", "description": "Authentication token"},
-    "authorization": {"type": "string", "description": "Basic authorization header value"}
+    "accountId": {"type": "string", "description": "The account ID to retrieve agency pay plan for"}
   },
-  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"]
+  "required": ["accountId"]
 }]]></mcp:parameters-schema>
             <mcp:responses>
                 <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
             </mcp:responses>
         </mcp:tool-listener>
         <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
         <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/agencypayplan" doc:name="GET Agency Pay Plan">
             <http:headers><![CDATA[#[output application/java --- {
-  "Source-System": vars.toolParams.sourceSystem,
-  "Target-System": vars.toolParams.targetSystem,
-  "X-Correlation-Id": vars.toolParams.correlationId,
-  "authToken": vars.toolParams.authToken,
-  "Authorization": vars.toolParams.authorization
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization')
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -194,30 +182,26 @@ payload]]></ee:set-payload>
   "type": "object",
   "properties": {
     "accountId": {"type": "string", "description": "The account ID to retrieve recommend budget for"},
-    "sourceSystem": {"type": "string", "description": "Source system identifier"},
-    "targetSystem": {"type": "string", "description": "Target system identifier"},
-    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
     "newBudgetDate": {"type": "string", "description": "New budget date (e.g., 2021-03-08)"},
     "defaultFlag": {"type": "string", "description": "Default flag (default: RCBUD)"},
     "recommendBudgetSwitch": {"type": "boolean", "description": "Recommend budget switch (default: true)"},
-    "budgetPlan": {"type": "string", "description": "Budget plan type (default: BPP)"},
-    "authToken": {"type": "string", "description": "Authentication token"},
-    "authorization": {"type": "string", "description": "Basic authorization header value"}
+    "budgetPlan": {"type": "string", "description": "Budget plan type (default: BPP)"}
   },
-  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "newBudgetDate"]
+  "required": ["accountId", "newBudgetDate"]
 }]]></mcp:parameters-schema>
             <mcp:responses>
                 <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
             </mcp:responses>
         </mcp:tool-listener>
         <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
         <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/recommendbudget" doc:name="GET Recommend Budget">
             <http:headers><![CDATA[#[output application/java --- {
-  "Source-System": vars.toolParams.sourceSystem,
-  "Target-System": vars.toolParams.targetSystem,
-  "X-Correlation-Id": vars.toolParams.correlationId,
-  "authToken": vars.toolParams.authToken,
-  "Authorization": vars.toolParams.authorization
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization')
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -247,11 +231,6 @@ payload]]></ee:set-payload>
   "type": "object",
   "properties": {
     "accountId": {"type": "string", "description": "The account ID to add budget for"},
-    "sourceSystem": {"type": "string", "description": "Source system identifier"},
-    "targetSystem": {"type": "string", "description": "Target system identifier"},
-    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
-    "authToken": {"type": "string", "description": "Authentication token"},
-    "authorization": {"type": "string", "description": "Basic authorization header value"},
     "addbudget": {
       "type": "object",
       "description": "Add budget request body",
@@ -296,21 +275,22 @@ payload]]></ee:set-payload>
       }
     }
   },
-  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "addbudget"]
+  "required": ["accountId", "addbudget"]
 }]]></mcp:parameters-schema>
             <mcp:responses>
                 <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
             </mcp:responses>
         </mcp:tool-listener>
         <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
         <http:request method="PUT" config-ref="HTTP_Request_Config" path="/account/{accountId}/addbudget" doc:name="PUT Add Budget">
             <http:body><![CDATA[#[output application/json --- {addbudget: vars.toolParams.addbudget}]]]></http:body>
             <http:headers><![CDATA[#[output application/java --- {
-  "Source-System": vars.toolParams.sourceSystem,
-  "Target-System": vars.toolParams.targetSystem,
-  "X-Correlation-Id": vars.toolParams.correlationId,
-  "authToken": vars.toolParams.authToken,
-  "Authorization": vars.toolParams.authorization,
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization'),
   "Content-Type": "application/json"
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
@@ -335,11 +315,6 @@ payload]]></ee:set-payload>
   "type": "object",
   "properties": {
     "accountId": {"type": "string", "description": "The account ID to cancel budget for"},
-    "sourceSystem": {"type": "string", "description": "Source system identifier"},
-    "targetSystem": {"type": "string", "description": "Target system identifier"},
-    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
-    "authToken": {"type": "string", "description": "Authentication token"},
-    "authorization": {"type": "string", "description": "Basic authorization header value"},
     "cancelbudget": {
       "type": "object",
       "description": "Cancel budget request body",
@@ -361,21 +336,22 @@ payload]]></ee:set-payload>
       }
     }
   },
-  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "cancelbudget"]
+  "required": ["accountId", "cancelbudget"]
 }]]></mcp:parameters-schema>
             <mcp:responses>
                 <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
             </mcp:responses>
         </mcp:tool-listener>
         <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
         <http:request method="PUT" config-ref="HTTP_Request_Config" path="/account/{accountId}/cancelbudget" doc:name="PUT Cancel Budget">
             <http:body><![CDATA[#[output application/json --- {cancelbudget: vars.toolParams.cancelbudget}]]]></http:body>
             <http:headers><![CDATA[#[output application/java --- {
-  "Source-System": vars.toolParams.sourceSystem,
-  "Target-System": vars.toolParams.targetSystem,
-  "X-Correlation-Id": vars.toolParams.correlationId,
-  "authToken": vars.toolParams.authToken,
-  "Authorization": vars.toolParams.authorization,
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization'),
   "Content-Type": "application/json"
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
@@ -399,27 +375,23 @@ payload]]></ee:set-payload>
             <mcp:parameters-schema><![CDATA[{
   "type": "object",
   "properties": {
-    "accountId": {"type": "string", "description": "The account ID to retrieve active payplan for"},
-    "sourceSystem": {"type": "string", "description": "Source system identifier"},
-    "targetSystem": {"type": "string", "description": "Target system identifier"},
-    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
-    "authToken": {"type": "string", "description": "Authentication token"},
-    "authorization": {"type": "string", "description": "Basic authorization header value"}
+    "accountId": {"type": "string", "description": "The account ID to retrieve active payplan for"}
   },
-  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"]
+  "required": ["accountId"]
 }]]></mcp:parameters-schema>
             <mcp:responses>
                 <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
             </mcp:responses>
         </mcp:tool-listener>
         <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
         <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/activepayplan" doc:name="GET Active Pay Plan">
             <http:headers><![CDATA[#[output application/java --- {
-  "Source-System": vars.toolParams.sourceSystem,
-  "Target-System": vars.toolParams.targetSystem,
-  "X-Correlation-Id": vars.toolParams.correlationId,
-  "authToken": vars.toolParams.authToken,
-  "Authorization": vars.toolParams.authorization
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization')
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -443,32 +415,28 @@ payload]]></ee:set-payload>
   "type": "object",
   "properties": {
     "payplanId": {"type": "string", "description": "The payplan ID to update or cancel"},
-    "sourceSystem": {"type": "string", "description": "Source system identifier"},
-    "targetSystem": {"type": "string", "description": "Target system identifier"},
-    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
     "iscancel": {"type": "string", "description": "Whether to cancel the payplan"},
-    "payplancancelreasondescription": {"type": "string", "description": "Reason description for payplan cancellation"},
-    "authToken": {"type": "string", "description": "Authentication token"},
-    "authorization": {"type": "string", "description": "Basic authorization header value"}
+    "payplancancelreasondescription": {"type": "string", "description": "Reason description for payplan cancellation"}
   },
-  "required": ["payplanId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "iscancel"]
+  "required": ["payplanId", "iscancel"]
 }]]></mcp:parameters-schema>
             <mcp:responses>
                 <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
             </mcp:responses>
         </mcp:tool-listener>
         <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
         <http:request method="PUT" config-ref="HTTP_Request_Config" path="/payplan/{payplanId}" doc:name="PUT Update Pay Plan">
             <http:body><![CDATA[#[output application/json --- {
   iscancel: vars.toolParams.iscancel,
   payplancancelreasondescription: vars.toolParams.payplancancelreasondescription
 }]]]></http:body>
             <http:headers><![CDATA[#[output application/java --- {
-  "Source-System": vars.toolParams.sourceSystem,
-  "Target-System": vars.toolParams.targetSystem,
-  "X-Correlation-Id": vars.toolParams.correlationId,
-  "authToken": vars.toolParams.authToken,
-  "Authorization": vars.toolParams.authorization,
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization'),
   "Content-Type": "application/json"
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
@@ -493,30 +461,26 @@ payload]]></ee:set-payload>
   "type": "object",
   "properties": {
     "accountId": {"type": "string", "description": "The account ID to retrieve payplan override for"},
-    "sourceSystem": {"type": "string", "description": "Source system identifier"},
-    "targetSystem": {"type": "string", "description": "Target system identifier"},
-    "correlationId": {"type": "string", "description": "Correlation ID for request tracking"},
-    "authToken": {"type": "string", "description": "Authentication token"},
-    "authorization": {"type": "string", "description": "Basic authorization header value"},
     "goodFaithPaymentDate": {"type": "string", "description": "Good faith payment date (e.g., 2016-03-31 00:00:00)"},
     "goodFaithPaymentAmount": {"type": "string", "description": "Good faith payment amount"},
     "numInstallments": {"type": "string", "description": "Number of installments"},
     "overrideType": {"type": "string", "description": "Override type (e.g., NONE)"}
   },
-  "required": ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"]
+  "required": ["accountId"]
 }]]></mcp:parameters-schema>
             <mcp:responses>
                 <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
             </mcp:responses>
         </mcp:tool-listener>
         <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
         <http:request method="GET" config-ref="HTTP_Request_Config" path="/account/{accountId}/payplanoverride" doc:name="GET Pay Plan Override">
             <http:headers><![CDATA[#[output application/java --- {
-  "Source-System": vars.toolParams.sourceSystem,
-  "Target-System": vars.toolParams.targetSystem,
-  "X-Correlation-Id": vars.toolParams.correlationId,
-  "authToken": vars.toolParams.authToken,
-  "Authorization": vars.toolParams.authorization
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization')
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -527,6 +491,46 @@ payload]]></ee:set-payload>
   ("numInstallments": vars.toolParams.numInstallments) if vars.toolParams.numInstallments?,
   ("overrideType": vars.toolParams.overrideType) if vars.toolParams.overrideType?
 }]]]></http:query-params>
+        </http:request>
+        <ee:transform doc:name="Transform Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- Flow 10: Get Pay Plan Schedules for Account -->
+    <flow name="get-payplan-schedules-flow" doc:id="get-payplan-schedules-flow">
+        <mcp:tool-listener config-ref="MCP_Server_Config" name="get-payplan-schedules" doc:name="get-payplan-schedules Tool">
+            <mcp:description><![CDATA[Get pay plan schedules for a given account id]]></mcp:description>
+            <mcp:parameters-schema><![CDATA[{
+  "type": "object",
+  "properties": {
+    "accountId": {"type": "string", "description": "The account ID to retrieve pay plan schedules for"}
+  },
+  "required": ["accountId"]
+}]]></mcp:parameters-schema>
+            <mcp:responses>
+                <mcp:text-tool-response-content text="#[write(payload, 'application/json')]" />
+            </mcp:responses>
+        </mcp:tool-listener>
+        <set-variable variableName="toolParams" value="#[payload]" doc:name="Save Tool Parameters" />
+        <flow-ref name="get-auth-token-subflow" doc:name="Get Auth Token" />
+        <http:request method="GET" config-ref="SAPI_Request_Config" path="/account/{accountId}/payPlan" doc:name="GET Pay Plan Schedules">
+            <http:headers><![CDATA[#[output application/java --- {
+  "Source-System": "CCSP",
+  "Target-System": "CCB",
+  "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
+  "correlationId": "agent-" ++ (floor(random() * 1000000) as String),
+  "authToken": vars.accessToken,
+  "Authorization": p('api.authorization')
+}]]]></http:headers>
+            <http:uri-params><![CDATA[#[output application/java --- {
+  "accountId": vars.toolParams.accountId
+}]]]></http:uri-params>
         </http:request>
         <ee:transform doc:name="Transform Response">
             <ee:message>
@@ -568,7 +572,8 @@ output application/json
     { name: "cancel-budget", method: "PUT", description: "Cancel budget for a given account id" },
     { name: "get-active-payplan", method: "GET", description: "Get active payplan for a given account" },
     { name: "update-payplan", method: "PUT", description: "Update or cancel payplan for a given payplan id" },
-    { name: "get-payplan-override", method: "GET", description: "Get payplan override for a given account id" }
+    { name: "get-payplan-override", method: "GET", description: "Get payplan override for a given account id" },
+    { name: "get-payplan-schedules", method: "GET", description: "Get pay plan schedules for a given account id" }
   ],
   resources: [
     { uri: "resource://server/overview", description: "This resource - server overview" },
@@ -598,59 +603,65 @@ output application/json
     {
       name: "get-payplan",
       description: "Get active pay plan for a given account id",
-      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"],
-      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>" }
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here" }
     },
     {
       name: "create-payplan",
       description: "Create pay plan for a given account id",
-      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "payplan"],
-      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", payplan: { payplandetails: { accountid: "1234567890", payplantype: "CIA", paymethod: "MAIL", startdate: "2026-01-01 00:00:00", pps: { ppsrow: [{ scheduleddate: "2026-02-01", scheduledamount: "100.00" }] } } } }
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "payplan"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", payplan: { payplandetails: { accountid: "1234567890", payplantype: "CIA", paymethod: "MAIL", startdate: "2026-01-01 00:00:00", pps: { ppsrow: [{ scheduleddate: "2026-02-01", scheduledamount: "100.00" }] } } } }
     },
     {
       name: "get-agency-payplan",
       description: "Get agency pay plan for a given account id",
-      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"],
-      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>" }
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here" }
     },
     {
       name: "get-recommend-budget",
       description: "Get recommend budget for a given account id",
-      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "newBudgetDate"],
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "newBudgetDate"],
       optionalParams: ["defaultFlag", "recommendBudgetSwitch", "budgetPlan"],
-      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", newBudgetDate: "2026-03-08", defaultFlag: "RCBUD", recommendBudgetSwitch: true, budgetPlan: "BPP" }
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", newBudgetDate: "2026-03-08", defaultFlag: "RCBUD", recommendBudgetSwitch: true, budgetPlan: "BPP" }
     },
     {
       name: "add-budget",
       description: "Add budget for a given account id",
-      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "addbudget"],
-      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", addbudget: { transactiontype: "ADD", addbudgetservice: { addbudgetdetails: { budgetplan: "BPP", newbudgetdate: "2026-03-08", totalbudgetamount: 500, totalnewbudget: 500 } } } }
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "addbudget"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", addbudget: { transactiontype: "ADD", addbudgetservice: { addbudgetdetails: { budgetplan: "BPP", newbudgetdate: "2026-03-08", totalbudgetamount: 500, totalnewbudget: 500 } } } }
     },
     {
       name: "cancel-budget",
       description: "Cancel budget for a given account id",
-      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "cancelbudget"],
-      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", cancelbudget: { cancelbudgetservice: { cancelbudgetdetails: { cancel: true, version: 1, newbudgetdate: "2026-03-08", totalnewbudget: 0 } } } }
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "cancelbudget"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", cancelbudget: { cancelbudgetservice: { cancelbudgetdetails: { cancel: true, version: 1, newbudgetdate: "2026-03-08", totalnewbudget: 0 } } } }
     },
     {
       name: "get-active-payplan",
       description: "Get active payplan for a given account",
-      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"],
-      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>" }
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId"],
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here" }
     },
     {
       name: "update-payplan",
       description: "Update or cancel payplan for a given payplan id",
-      requiredParams: ["payplanId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization", "iscancel"],
+      requiredParams: ["payplanId", "sourceSystem", "targetSystem", "correlationId", "iscancel"],
       optionalParams: ["payplancancelreasondescription"],
-      example: { payplanId: "PP-12345", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", iscancel: "true", payplancancelreasondescription: "Customer requested cancellation" }
+      example: { payplanId: "PP-12345", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", iscancel: "true", payplancancelreasondescription: "Customer requested cancellation" }
     },
     {
       name: "get-payplan-override",
       description: "Get payplan override for a given account id",
-      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId", "authToken", "authorization"],
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId"],
       optionalParams: ["goodFaithPaymentDate", "goodFaithPaymentAmount", "numInstallments", "overrideType"],
-      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", authToken: "<token>", authorization: "Basic <base64>", goodFaithPaymentDate: "2026-03-31 00:00:00", goodFaithPaymentAmount: "50.00", numInstallments: "6", overrideType: "NONE" }
+      example: { accountId: "1234567890", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here", goodFaithPaymentDate: "2026-03-31 00:00:00", goodFaithPaymentAmount: "50.00", numInstallments: "6", overrideType: "NONE" }
+    },
+    {
+      name: "get-payplan-schedules",
+      description: "Get pay plan schedules for a given account id",
+      requiredParams: ["accountId", "sourceSystem", "targetSystem", "correlationId"],
+      example: { accountId: "0134325384", sourceSystem: "MCP", targetSystem: "Salesforce", correlationId: "uuid-here" }
     }
   ]
 }]]></ee:set-payload>
@@ -686,14 +697,14 @@ output application/json
     { method: "PUT", path: "/account/{accountId}/cancelbudget", description: "Cancel budget for account", tool: "cancel-budget" },
     { method: "GET", path: "/account/{accountId}/activepayplan", description: "Get active payplan for account", tool: "get-active-payplan" },
     { method: "PUT", path: "/payplan/{payplanId}", description: "Update or cancel payplan", tool: "update-payplan" },
-    { method: "GET", path: "/account/{accountId}/payplanoverride", description: "Get payplan override for account", tool: "get-payplan-override" }
+    { method: "GET", path: "/account/{accountId}/payplanoverride", description: "Get payplan override for account", tool: "get-payplan-override" },
+    { method: "GET", path: "/account/{accountId}/payPlan", description: "Get pay plan schedules for account (SAPI)", tool: "get-payplan-schedules" }
   ],
   requiredHeaders: [
     { name: "Source-System", description: "Source system identifier" },
     { name: "Target-System", description: "Target system identifier" },
     { name: "X-Correlation-Id", description: "Correlation ID for request tracking" },
-    { name: "authToken", description: "Authentication token" },
-    { name: "Authorization", description: "Basic authorization header value" }
+    { name: "Authorization", description: "Basic authorization header (hardcoded)" }
   ]
 }]]></ee:set-payload>
             </ee:message>

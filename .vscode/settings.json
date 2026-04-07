@@ -7,5 +7,6 @@
         "**/Thumbs.db": true,
         "target": true,
         ".mule": true
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
