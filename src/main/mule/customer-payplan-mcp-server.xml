@@ -40,8 +40,7 @@
   "Source-System": "CCSP",
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
-  "authToken": vars.accessToken,
-  "Authorization": p('api.authorization')
+  "authToken": vars.accessToken
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -118,7 +117,6 @@ payload]]></ee:set-payload>
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
   "authToken": vars.accessToken,
-  "Authorization": p('api.authorization'),
   "Content-Type": "application/json"
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
@@ -157,8 +155,7 @@ payload]]></ee:set-payload>
   "Source-System": "CCSP",
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
-  "authToken": vars.accessToken,
-  "Authorization": p('api.authorization')
+  "authToken": vars.accessToken
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -200,8 +197,7 @@ payload]]></ee:set-payload>
   "Source-System": "CCSP",
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
-  "authToken": vars.accessToken,
-  "Authorization": p('api.authorization')
+  "authToken": vars.accessToken
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -290,7 +286,6 @@ payload]]></ee:set-payload>
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
   "authToken": vars.accessToken,
-  "Authorization": p('api.authorization'),
   "Content-Type": "application/json"
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
@@ -351,7 +346,6 @@ payload]]></ee:set-payload>
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
   "authToken": vars.accessToken,
-  "Authorization": p('api.authorization'),
   "Content-Type": "application/json"
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
@@ -390,8 +384,7 @@ payload]]></ee:set-payload>
   "Source-System": "CCSP",
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
-  "authToken": vars.accessToken,
-  "Authorization": p('api.authorization')
+  "authToken": vars.accessToken
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -436,7 +429,6 @@ payload]]></ee:set-payload>
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
   "authToken": vars.accessToken,
-  "Authorization": p('api.authorization'),
   "Content-Type": "application/json"
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
@@ -479,8 +471,7 @@ payload]]></ee:set-payload>
   "Source-System": "CCSP",
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
-  "authToken": vars.accessToken,
-  "Authorization": p('api.authorization')
+  "authToken": vars.accessToken
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
@@ -525,8 +516,7 @@ payload]]></ee:set-payload>
   "Target-System": "CCB",
   "X-Correlation-Id": "agent-" ++ (floor(random() * 1000000) as String),
   "correlationId": "agent-" ++ (floor(random() * 1000000) as String),
-  "authToken": vars.accessToken,
-  "Authorization": p('api.authorization')
+  "authToken": vars.accessToken
 }]]]></http:headers>
             <http:uri-params><![CDATA[#[output application/java --- {
   "accountId": vars.toolParams.accountId
