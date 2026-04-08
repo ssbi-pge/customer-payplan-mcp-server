@@ -18,8 +18,8 @@
         <app.runtime>4.9.13</app.runtime>
         <mule.maven.plugin.version>4.7.0</mule.maven.plugin.version>
 
-        <anypoint.client_id>cdcf7db8360047f29a4d2cbd38c835a4</anypoint.client_id>
-        <anypoint.client_secret>03cD63E334EB4b46Af49196672d4B26A</anypoint.client_secret>
+        <anypoint.client_id>xxxxxxxx</anypoint.client_id>
+        <anypoint.client_secret>xxxxxxx</anypoint.client_secret>
     </properties>
 
     <build>
@@ -56,7 +56,7 @@
                         <vCores>0.1</vCores>
 
                         <secureProperties>
-                            <secure.key>pg&amp;eccsp12345678</secure.key>
+                            <secure.key>xxxxxxxx</secure.key>
                         </secureProperties>
                     </cloudhub2Deployment>
 
