@@ -8,7 +8,7 @@
 
     <groupId>dd8ff7a4-358c-4526-b05f-1a1d690411f1</groupId>
     <artifactId>customer-payplan-mcp-server</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>mule-application</packaging>
     <name>customer-payplan-mcp-server</name>
 
