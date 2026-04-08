@@ -22,6 +22,7 @@
     </secure-properties:config>
 
     <tls:context name="TLS_Context" doc:name="TLS Context">
+        <tls:trust-store insecure="true" />
         <tls:key-store type="pkcs12" path="tls/mulekeystore.p12" keyPassword="${secure::tls.keystore.password}" password="${secure::tls.keystore.password}" />
     </tls:context>
 
@@ -37,6 +38,9 @@
 
     <http:request-config name="HTTP_Request_Config" doc:name="HTTP Request Config" basePath="${api.basePath}">
         <http:request-connection host="${api.host}" port="${api.port}" protocol="HTTPS">
+			<tls:context>
+				<tls:trust-store insecure="true" />
+			</tls:context>
             <http:authentication>
                 <http:basic-authentication username="${secure::api.basic.username}" password="${secure::api.basic.password}" />
             </http:authentication>
@@ -45,6 +49,9 @@
 
     <http:request-config name="SAPI_Request_Config" doc:name="SAPI Request Config" basePath="${sapi.basePath}">
         <http:request-connection host="${sapi.host}" port="${sapi.port}" protocol="HTTPS">
+			<tls:context>
+				<tls:trust-store insecure="true" />
+			</tls:context>
             <http:authentication>
                 <http:basic-authentication username="${secure::api.basic.username}" password="${secure::api.basic.password}" />
             </http:authentication>
@@ -53,7 +60,11 @@
 
     <!-- OAuth Token Request Configuration -->
     <http:request-config name="OAuth_Token_Request_Config" doc:name="OAuth Token Request Config">
-        <http:request-connection host="${oauth.token.host}" port="${oauth.token.port}" protocol="HTTPS" />
+        <http:request-connection host="${oauth.token.host}" port="${oauth.token.port}" protocol="HTTPS">
+			<tls:context>
+				<tls:trust-store insecure="true" />
+			</tls:context>
+        </http:request-connection>
     </http:request-config>
 
     <!-- Sub-flow to retrieve OAuth access token -->

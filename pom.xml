@@ -8,7 +8,7 @@
 
     <groupId>dd8ff7a4-358c-4526-b05f-1a1d690411f1</groupId>
     <artifactId>customer-payplan-mcp-server</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.6</version>
     <packaging>mule-application</packaging>
     <name>customer-payplan-mcp-server</name>
 
@@ -41,7 +41,7 @@
                     <classifier>mule-application</classifier>
 
                     
-                    <cloudHubDeployment>
+                    <cloudhub2Deployment>
                         <uri>https://anypoint.mulesoft.com</uri>
                         <muleVersion>${app.runtime}</muleVersion>
 
@@ -51,12 +51,14 @@
 
                         <applicationName>customer-payplan-mcp-server</applicationName>
                         <environment>Dev3</environment>
-                        <region>us-west-2</region>
 
-                        <workers>1</workers>
-                        <workerType>MICRO</workerType>
-                        <objectStoreV2>true</objectStoreV2>
-                    </cloudHubDeployment>
+                        <replicas>1</replicas>
+                        <vCores>0.1</vCores>
+
+                        <secureProperties>
+                            <secure.key>pg&amp;eccsp12345678</secure.key>
+                        </secureProperties>
+                    </cloudhub2Deployment>
 
                 </configuration>
             </plugin>
